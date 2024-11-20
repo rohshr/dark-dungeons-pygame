@@ -1,2 +1,2 @@
-# dark-dungeons-pygame
-A dungeon crawler game made using PyGame
+# Dark Dungeons
+## A dungeon crawler game made using PyGame
