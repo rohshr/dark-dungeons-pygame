@@ -23,7 +23,7 @@ class Player(GameSprite):
         self.image = getattr(self.actions_list[self.action], self.direction_status)[self.frame_index]
         
         # Setting hitbox with respect to the sprite
-        self.hitbox = self.rect.inflate(0, -2)
+        self.hitbox = self.rect.inflate(0, 0)
         self.collision_sprites = collision_sprites
 
     # Private Helper method    

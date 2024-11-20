@@ -36,9 +36,14 @@ class Level:
             if isinstance(layer, pytmx.TiledTileLayer):
                 if layer.name == layer_name:
                     for x, y, gid in layer:
+                        # tile_img = pygame.Surface((TILE_SIZE, TILE_SIZE), pygame.SRCALPHA)
                         tile_img = self.tmx_data.get_tile_image_by_gid(gid)
+                        # print(tile_img)
                         if tile_img:
-                            tile_images.append(tile_img)
+                            temp_img = pygame.Surface((TILE_SIZE, TILE_SIZE), pygame.SRCALPHA)
+                            temp_img.blit(tile_img.convert_alpha(), (0, 0), tile_img.get_rect())
+                            temp_img.set_colorkey('black')
+                            tile_images.append(temp_img)
         return(tile_images)
                             
     
@@ -122,5 +127,5 @@ class YSortCameraGroup(pygame.sprite.Group):
         
         for sprite in sorted(self.sprites(), key = lambda sprite: sprite.rect.centery):
             offset_pos = sprite.rect.topleft - self.offset
-            self.display_surface.blit(sprite.image, offset_pos)
+            self.display_surface.blit(sprite.image.convert_alpha(), offset_pos)
             
