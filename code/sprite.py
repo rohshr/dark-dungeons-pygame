@@ -35,6 +35,8 @@ class GameSprite(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center = pos)
         self.pos = pygame.math.Vector2(self.rect.center)
         
+        self.hitbox = self.rect.inflate(0, 0)
+        
         self.action = ""
         self.direction_status = "down"
         self.frame_index = 0
@@ -43,21 +45,38 @@ class GameSprite(pygame.sprite.Sprite):
         self.update_time = pygame.time.get_ticks()
         self.actions_list = {}
     
-    def __repr__(self):
-        """Return a string representation of the sprite."""
-        # return f"GameSprite in {self.spritesheet_image} at ({self.x}, {self.y})"
-    
-    def update(self):
-        pass
-        # self.rect = self.image.get_rect(center = self.pos)
-        # self.rect.center = self.pos
-        # screen.blit(self.image, self.rect) # Draw the sprite on the screen
-        # pygame.display.update()
-    
     def animate(self):
         animation_timer = ANIMATION_TIMER
         if (pygame.time.get_ticks() - self.update_time > animation_timer): # condition to check current time to update the frame
             self.update_time = pygame.time.get_ticks()
             # self.frame_index = (self.frame_index + 1) % len(self.actions_list[self.action]) #getattr(self.actions_list[self.action], self.direction_status)[self.frame_index]
             self.frame_index = (self.frame_index + 1) % len(getattr(self.actions_list[self.action], self.direction_status)) #getattr(self.actions_list[self.action], self.direction_status)[self.frame_index]
-            self.image = getattr(self.actions_list[self.action], self.direction_status)[self.frame_index]
+            self.image = getattr(self.actions_list[self.action], self.direction_status)[self.frame_index]        
+
+    def move(self, speed):
+        if self.direction.magnitude() != 0:
+            self.direction = self.direction.normalize()
+
+        self.hitbox.x += self.direction.x * speed
+        self.collision('horizontal')
+        self.hitbox.y += self.direction.y * speed
+        self.collision('vertical')
+        self.rect.center = self.hitbox.center
+        # self.pos = self.hitbox.center
+
+    def collision(self, axis):
+        if axis == 'horizontal':
+            for sprite in self.collision_sprites:
+                if sprite.hitbox.colliderect(self.hitbox):
+                    if self.direction.x > 0: # moving right
+                        self.hitbox.right = sprite.hitbox.left
+                    if self.direction.x < 0: # moving left
+                        self.hitbox.left = sprite.hitbox.right
+
+        if axis == 'vertical':
+            for sprite in self.collision_sprites:
+                if sprite.hitbox.colliderect(self.hitbox):
+                    if self.direction.y > 0: # moving down
+                        self.hitbox.bottom = sprite.hitbox.top
+                    if self.direction.y < 0: # moving up
+                        self.hitbox.top = sprite.hitbox.bottom

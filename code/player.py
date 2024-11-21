@@ -83,49 +83,53 @@ class Player(GameSprite):
             self.direction.y = 0
             # self.direction_status = (0, 0)
     
-    def move(self):
-        '''Function to move the character'''
-        # Normalize the movement vector to prevent faster diagonal movement
-        if self.direction.magnitude() > 0:
-            self.direction = self.direction.normalize()
+    # def move(self):
+    #     '''Function to move the character'''
+    #     # Normalize the movement vector to prevent faster diagonal movement
+    #     if self.direction.magnitude() > 0:
+    #         self.direction = self.direction.normalize()
 
-        # Update the player's position
-        # horizontal movement
-        self.hitbox.x += self.direction.x * self.speed
-        self.collision('horizontal')
+    #     # Update the player's position
+    #     # horizontal movement
+    #     self.hitbox.x += self.direction.x * self.speed
+    #     self.collision('horizontal')
         
-        # vertical movement
-        self.hitbox.y += self.direction.y * self.speed
-        self.collision('vertical')
-        # self.rect.center = self.position
+    #     # vertical movement
+    #     self.hitbox.y += self.direction.y * self.speed
+    #     self.collision('vertical')
+    #     # self.rect.center = self.position
         
-        self.rect.center = self.hitbox.center
+    #     self.rect.center = self.hitbox.center
+        
+    #     pygame.draw.rect(pygame.display.get_surface(), (255, 0, 0), self.hitbox, 2)
+        
         
         # Ensure the player stays within screen boundaries
         # self.rect.x = max(0, min(SCREEN_WIDTH - self.width, self.pos.x))
         # self.rect.y = max(0, min(SCREEN_HEIGHT - self.height, self.pos.y))
 
-    def collision(self, axis):
-        if axis == 'horizontal':
-            for sprite in self.collision_sprites:
-                if sprite.hitbox.colliderect(self.hitbox): # check the rect of collision object with the rect of player
-                    if self.direction.x > 0: # check right movement
-                        self.hitbox.right = sprite.hitbox.left # collision for right side of the player rect to the left side of the collider rect
-                    elif self.direction.x < 0:# check left movement
-                        self.hitbox.left = sprite.hitbox.right # when moving left
+    # def collision(self, axis):
+    #     if axis == 'horizontal':
+    #         for sprite in self.collision_sprites:
+    #             if sprite.hitbox.colliderect(self.hitbox): # check the rect of collision object with the rect of player
+    #                 pygame.draw.rect(pygame.display.get_surface(), (255, 0, 0), sprite.hitbox, 2)
+    #                 if self.direction.x > 0: # check right movement
+    #                     self.hitbox.right = sprite.hitbox.left # collision for right side of the player rect to the left side of the collider rect
+    #                 elif self.direction.x < 0:# check left movement
+    #                     self.hitbox.left = sprite.hitbox.right # when moving left
         
-        if axis == 'vertical':
-            for sprite in self.collision_sprites:
-                if sprite.hitbox.colliderect(self.hitbox):
-                    if self.direction.y < 0: # check up movement
-                        self.hitbox.top = sprite.hitbox.bottom 
-                    elif self.direction.y > 0: # check down movement
-                        self.hitbox.bottom = sprite.hitbox.top 
+    #     if axis == 'vertical':
+    #         for sprite in self.collision_sprites:
+    #             if sprite.hitbox.colliderect(self.hitbox):
+    #                 if self.direction.y < 0: # check up movement
+    #                     self.hitbox.top = sprite.hitbox.bottom 
+    #                 elif self.direction.y > 0: # check down movement
+    #                     self.hitbox.bottom = sprite.hitbox.top 
 
     def update(self):
         # self.draw(pygame.display.get_surface())
         self.keypress_handler()
-        self.move()
+        self.move(ANIMATION_SPEED)
         self.animate()
         
   

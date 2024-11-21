@@ -4,6 +4,12 @@ from pygame.math import Vector2
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 FPS = 60
+HITBOX_OFFSET = {
+	'player': 0,
+	'object': 0,
+	'walls': 0,
+    'floor': 0,
+	'invisible': 0}
 
 SPRITE_WIDTH = 24
 SPRITE_HEIGHT = 32

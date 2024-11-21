@@ -75,7 +75,6 @@ class Game:
         pygame.display.set_caption('Dungeon Escape')
         self.clock = pygame.time.Clock()
         self.level = Level()
-        print(self.level.visible_sprites)
     
     def run(self):
         while True:
