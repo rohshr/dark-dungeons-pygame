@@ -20,7 +20,7 @@ class SpriteAnimationFrames:
 class GameSprite(pygame.sprite.Sprite):
     """A class to represent a generic game sprite with animation support."""
     
-    def __init__(self, pos, groups, spritesheet_image_file, width=SPRITE_WIDTH, height=SPRITE_HEIGHT, scale=SPRITE_SCALE, color_key = COLOR_KEY):
+    def __init__(self, pos, groups, collision_sprites, spritesheet_image_file, width=SPRITE_WIDTH, height=SPRITE_HEIGHT, scale=SPRITE_SCALE, color_key = COLOR_KEY):
         super().__init__(groups)
         self.spritesheet_image_file = spritesheet_image_file
         self.spritesheet_image = pygame.image.load(spritesheet_image_file).convert_alpha()
@@ -36,6 +36,8 @@ class GameSprite(pygame.sprite.Sprite):
         self.pos = pygame.math.Vector2(self.rect.center)
         
         self.hitbox = self.rect.inflate(0, 0)
+        self.collision_sprites = collision_sprites
+        
         
         self.action = ""
         self.direction_status = "down"
@@ -61,7 +63,7 @@ class GameSprite(pygame.sprite.Sprite):
         self.collision('horizontal')
         self.hitbox.y += self.direction.y * speed
         self.collision('vertical')
-        self.rect.center = self.hitbox.center
+        self.rect.center = self.hitbox.topleft
         # self.pos = self.hitbox.center
 
     def collision(self, axis):

@@ -58,7 +58,8 @@
             "scaleInEditor": 2
         },
         "Tilesets/Cave Floor.tsx": {
-            "scaleInDock": 1
+            "scaleInDock": 1,
+            "scaleInEditor": 3
         },
         "Tilesets/Walls and Floors.tsx": {
             "scaleInDock": 1,
@@ -94,21 +95,25 @@
             "scaleInDock": 1,
             "scaleInEditor": 3
         },
+        "enemies_2.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
         "level_design.tmx": {
             "expandedObjectLayers": [
                 4
             ],
-            "scale": 0.75,
-            "selectedLayer": 5,
+            "scale": 2,
+            "selectedLayer": 6,
             "viewCenter": {
-                "x": 790.6666666666667,
-                "y": 639.3333333333334
+                "x": 447.25,
+                "y": 139
             }
         }
     },
     "frame.defaultDuration": 200,
-    "last.exportedFilePath": "C:/Users/rohan/OneDrive - University of Idaho/UIdaho - Experimental Psychology/Fall 2024/VTD 247/vtd-247-f24/game-project/map",
-    "last.imagePath": "C:/Users/rohan/OneDrive - University of Idaho/UIdaho - Experimental Psychology/Fall 2024/VTD 247/vtd-247-f24/game-project/graphics",
+    "last.exportedFilePath": "C:/Users/rohan/OneDrive - University of Idaho/UIdaho - Experimental Psychology/Fall 2024/VTD 247/Project/dark-dungeons-pygame/map",
+    "last.imagePath": "C:/Users/rohan/OneDrive - University of Idaho/UIdaho - Experimental Psychology/Fall 2024/VTD 247/Project/dark-dungeons-pygame/data/Tilesets/DampDungeons/Animations",
     "map.height": 80,
     "map.lastUsedExportFilter": "CSV files (*.csv)",
     "map.lastUsedFormat": "tmx",
@@ -120,23 +125,25 @@
         "Tilesets/Walls and Floors.tsx",
         "Tilesets/environment.tsx",
         "Tilesets/animated_tiles.tsx",
-        "Tilesets/WaterTiles.tsx"
+        "Tilesets/WaterTiles.tsx",
+        "Tilesets/Cave Floor.tsx",
+        "Tilesets/player.tsx"
     ],
     "project": "dungeons.tiled-project",
     "property.type": "float",
     "recentFiles": [
+        "enemies_2.tsx",
+        "Tilesets/player.tsx",
+        "Tilesets/Cave Floor.tsx",
         "Tilesets/WaterTiles.tsx",
         "Tilesets/animated_tiles.tsx",
         "Tilesets/environment.tsx",
         "Tilesets/Walls and Floors.tsx",
         "level_design.tmx",
-        "Tilesets/player.tsx",
         "Tilesets/custom_tiles.tsx",
         "C:/Users/rohan/Downloads/s23 - Audio & fixes/s23 - Audio & fixes/data/map.tmx",
         "WaterTiles.tsx",
-        "C:/Users/rohan/Downloads/s23 - Audio & fixes/s23 - Audio & fixes/data/Tilesets/House.tsx",
-        "C:/Users/rohan/Downloads/s23 - Audio & fixes/s23 - Audio & fixes/data/Tilesets/Fences.tsx",
-        "C:/Users/rohan/Downloads/s23 - Audio & fixes/s23 - Audio & fixes/data/Tilesets/Grass.tsx"
+        "C:/Users/rohan/Downloads/s23 - Audio & fixes/s23 - Audio & fixes/data/Tilesets/House.tsx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {

@@ -5,17 +5,16 @@ from sprite import *
 class Player(GameSprite):
     """ Class for the playable character """
     def __init__(self, pos, groups, collision_sprites, spritesheet_image_file):
-        super().__init__(pos, groups, spritesheet_image_file)
+        super().__init__(pos, groups, collision_sprites, spritesheet_image_file)
         # self.position = pos
-        self.spritesheet_rows = 8
-        self.spritesheet_cols = 12
         self.action = "idle"
         self.direction_status = "down"
         self.frame_index = 0
         self.actions_list = {
             "idle": SpriteAnimationFrames(),
             "walking": SpriteAnimationFrames(),
-            "digging": SpriteAnimationFrames()
+            "digging": SpriteAnimationFrames(),
+            "attacking": SpriteAnimationFrames()
         }
         self._load_animation_frames()
         
@@ -23,8 +22,20 @@ class Player(GameSprite):
         self.image = getattr(self.actions_list[self.action], self.direction_status)[self.frame_index]
         
         # Setting hitbox with respect to the sprite
-        self.hitbox = self.rect.inflate(0, 0)
+        self.hitbox = self.rect.inflate(0, HITBOX_OFFSET['player'])
         self.collision_sprites = collision_sprites
+        
+        # stats
+        self.stats = {
+            'health': 100,
+            'has_light': True,
+            'has_weapon': False,
+            'has_key': False
+        }
+        self.health = self.stats['health']
+        self.has_light = self.stats['has_light']
+        self.has_weapon = self.stats['has_weapon']
+        self.has_key = self.stats['has_key']
 
     # Private Helper method    
     def _load_frame(self, action_frames, row, start_col, end_col):
@@ -42,7 +53,8 @@ class Player(GameSprite):
         actions = {
             "idle": (3, 6),    # Columns 3-5
             "walking": (0, 4), # Columns 0-3
-            "digging": (15, 18)  # Columns 15-17
+            "digging": (15, 18),  # Columns 15-17
+            "attacking": (18, 21)
         }
         
         for action, (start_col, end_col) in actions.items():
@@ -54,6 +66,11 @@ class Player(GameSprite):
         """Method to handle key presses for player actions."""
         keys = pygame.key.get_pressed() # Checks for all pressed keys
         # Update movement vector based on key input
+        if keys[pygame.K_LSHIFT]:
+            self.speed = ANIMATION_SPEED * 2
+        else:
+            self.speed = ANIMATION_SPEED
+            
         if keys[pygame.K_UP] or keys[pygame.K_w]:
             self.action = "walking"
             self.direction.y = -1
@@ -73,68 +90,16 @@ class Player(GameSprite):
             self.action = "walking"
             self.direction.x = 1
             self.direction_status = "right"
-        
+             
         elif keys[pygame.K_SPACE]:
-            self.action = "digging"
+            self.action = "attacking"
         
         else:
             self.action = "idle"
             self.direction.x = 0
             self.direction.y = 0
-            # self.direction_status = (0, 0)
-    
-    # def move(self):
-    #     '''Function to move the character'''
-    #     # Normalize the movement vector to prevent faster diagonal movement
-    #     if self.direction.magnitude() > 0:
-    #         self.direction = self.direction.normalize()
-
-    #     # Update the player's position
-    #     # horizontal movement
-    #     self.hitbox.x += self.direction.x * self.speed
-    #     self.collision('horizontal')
-        
-    #     # vertical movement
-    #     self.hitbox.y += self.direction.y * self.speed
-    #     self.collision('vertical')
-    #     # self.rect.center = self.position
-        
-    #     self.rect.center = self.hitbox.center
-        
-    #     pygame.draw.rect(pygame.display.get_surface(), (255, 0, 0), self.hitbox, 2)
-        
-        
-        # Ensure the player stays within screen boundaries
-        # self.rect.x = max(0, min(SCREEN_WIDTH - self.width, self.pos.x))
-        # self.rect.y = max(0, min(SCREEN_HEIGHT - self.height, self.pos.y))
-
-    # def collision(self, axis):
-    #     if axis == 'horizontal':
-    #         for sprite in self.collision_sprites:
-    #             if sprite.hitbox.colliderect(self.hitbox): # check the rect of collision object with the rect of player
-    #                 pygame.draw.rect(pygame.display.get_surface(), (255, 0, 0), sprite.hitbox, 2)
-    #                 if self.direction.x > 0: # check right movement
-    #                     self.hitbox.right = sprite.hitbox.left # collision for right side of the player rect to the left side of the collider rect
-    #                 elif self.direction.x < 0:# check left movement
-    #                     self.hitbox.left = sprite.hitbox.right # when moving left
-        
-    #     if axis == 'vertical':
-    #         for sprite in self.collision_sprites:
-    #             if sprite.hitbox.colliderect(self.hitbox):
-    #                 if self.direction.y < 0: # check up movement
-    #                     self.hitbox.top = sprite.hitbox.bottom 
-    #                 elif self.direction.y > 0: # check down movement
-    #                     self.hitbox.bottom = sprite.hitbox.top 
 
     def update(self):
-        # self.draw(pygame.display.get_surface())
         self.keypress_handler()
-        self.move(ANIMATION_SPEED)
+        self.move(self.speed)
         self.animate()
-        
-  
-# class Player(pygame.sprite.Sprite):
-# 	def __init__(self, pos, groups):
-# 		super().__init__(groups)
-# 		self.image = pygame.image.load('../graphics/test/star.png')
-# 		self.rect = self.image.get_rect(topleft = pos)

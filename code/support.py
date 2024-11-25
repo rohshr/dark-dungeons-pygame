@@ -24,6 +24,15 @@ def import_folder(path):
             
     return surface_list
 
+def get_image_surfaces(paths):
+    surface_list = []
+    
+    for path in paths:
+        image_surf = pygame.image.load(path).convert_alpha()
+        surface_list.append(image_surf)
+    
+    return surface_list
+
 # def get_layer(tmx_data):
 #     # tile_images = []
 #     for layer in tmx_data.visible_layers:
