@@ -6,67 +6,7 @@ from sprite import *
 from player import *
 from level import *
 from debug import debug
-
-# Draw the map
-# def draw_map(tmx_data):
-#     for layer in tmx_data.visible_layers:
-#         if isinstance(layer, pytmx.TiledTileLayer):
-#             for x, y, gid in layer:
-#                 tile = tmx_data.get_tile_image_by_gid(gid)
-#                 if tile:
-#                     screen.blit(tile, (x * tmx_data.tilewidth, y * tmx_data.tileheight))      
-        
-
-# if __name__ == "__main__":
-#     # Initialize Pygame
-#     pygame.init()
-
-#     # Screen
-#     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    
-#     # Load the TMX map
-#     tmx_data = pytmx.load_pygame("../data/level_design.tmx")
-#     pygame.display.set_caption('Dungeons Game')
-
-
-#     # Load background image
-#     # bg_image = pygame.image.load('../data/level1-background.png')
-
-#     player = Player(x_pos = 200, y_pos = 300)
-    
-    
-#     # Main game loop
-#     clock = pygame.time.Clock()
-#     running = True
-
-#     while running:
-
-#         # Clear the screen
-#         screen.fill((0, 0, 0))
-#         # screen.blit(bg_image, (0, 0))
-#         draw_map(tmx_data)
-        
-#         for event in pygame.event.get():
-#             if event.type == pygame.QUIT:
-#                 running = False
-                
-            
-
-#         # Draw the sprite
-#         # player.draw(screen)
-#         # player.update_animation()
-#         # player.x_pos += 1
-#         # print(player.frame_index)
-#         player.keypress_handler()
-#         player.draw(screen=screen)
-#         player.update_animation()
-        
-#         # Update the display
-#         # pygame.time.delay(30)
-#         pygame.display.update()
-#         clock.tick(60)  # Limit to 60 FPS
-        
-#     pygame.quit()
+from ui import *
 
 class Game:
     def __init__(self):
@@ -75,19 +15,100 @@ class Game:
         pygame.display.set_caption('Dungeon Escape')
         self.clock = pygame.time.Clock()
         self.level = Level()
+        self.ui = UI()
+        self.current_screen = 'start_screen'
+        self.start_time = pygame.time.get_ticks()
     
     def run(self):
         while True:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
+            if self.current_screen == 'start_screen':
+                self.ui.show_start_screen()
+                start_button = self.ui.start_button
+                help_button = self.ui.help_button
+                start_button.draw(self.screen)
+                help_button.draw(self.screen)
+                
+                pygame.display.update()
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+                    if start_button.handle_event(event):
+                        self.current_screen = 'game'
+                    if help_button.handle_event(event):
+                        self.current_screen = 'instructions'                   
+                        
+            elif self.current_screen == 'instructions':
+                self.ui.show_instructions_screen()
+                back_button = self.ui.back_button
+                back_button.draw(self.screen)
+                pygame.display.update()
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+                    if back_button.handle_event(event):
+                        self.current_screen = 'start_screen'
             
-            self.screen.fill('black')
-            self.level.run()
-            # debug('Test')
-            pygame.display.update()
-            self.clock.tick(FPS)
+            elif self.current_screen == 'paused':
+                self.ui.show_pause_menu()
+                resume_button = self.ui.resume_button
+                resume_button.draw(self.screen)
+                pygame.display.update()
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+                    if resume_button.handle_event(event):
+                        self.current_screen = 'game'
+            
+            elif self.current_screen == 'death':
+                self.ui.show_death_screen()
+                retry_button = self.ui.retry_button
+                retry_button.draw(self.screen)
+                pygame.display.update()
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+                    if retry_button.handle_event(event):
+                        self.current_screen = 'game'
+                        self.level = Level()
+                        
+            elif self.current_screen == 'end':
+                self.ui.show_end_screen()
+                restart_button = self.ui.retry_button
+                restart_button.draw(self.screen)
+                pygame.display.update()
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+                    if restart_button.handle_event(event):
+                        self.current_screen = 'game'
+                        self.level = Level()
+                        
+            elif self.current_screen == 'game':
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_ESCAPE:
+                            self.current_screen = 'paused'
+                    
+                    if self.level.player.health <= 0:
+                        print('death')
+                        self.current_screen = 'death'
+                    
+                    if self.level.door_open and self.level.player.check_exit():
+                        self.current_screen = 'end'
+                
+                self.screen.fill('black')
+                self.level.run()
+                # debug('Test')
+                pygame.display.update()
+                self.clock.tick(FPS)
 
 if __name__ == '__main__':
     game = Game()

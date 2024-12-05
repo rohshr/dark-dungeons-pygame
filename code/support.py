@@ -1,9 +1,6 @@
 from csv import reader
 from os import walk
 import pygame
-# import pytmx
-# from pytmx.util_pygame import load_pygame
-
 
 def import_csv_layout(path):
     terrain_map = []
@@ -32,16 +29,3 @@ def get_image_surfaces(paths):
         surface_list.append(image_surf)
     
     return surface_list
-
-# def get_layer(tmx_data):
-#     # tile_images = []
-#     for layer in tmx_data.visible_layers:
-#         print(layer)
-#         # if layer.name == layer_name and isinstance(layer, pytmx.TiledTileLayer):
-#         #         # for x, y, gid in layer:
-#         #         #     img = tmx_data.get_tile_image_by_gid(gid)
-#         #         #     if img:
-#         #         #         tile_images.append(img)
-    
-#         #     return layer 
-

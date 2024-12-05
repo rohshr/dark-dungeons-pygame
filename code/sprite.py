@@ -1,5 +1,6 @@
 import pygame
 from settings import *
+from math import sin
 
 class SpriteAnimationFrames:
     '''Class for storing sprite animation data'''
@@ -49,11 +50,19 @@ class GameSprite(pygame.sprite.Sprite):
     
     def animate(self):
         animation_timer = ANIMATION_TIMER
-        if (pygame.time.get_ticks() - self.update_time > animation_timer): # condition to check current time to update the frame
+        frame_count = len(getattr(self.actions_list[self.action], self.direction_status))
+        if (pygame.time.get_ticks() - self.update_time > animation_timer) and frame_count != 0: # condition to check current time to update the frame
             self.update_time = pygame.time.get_ticks()
-            # self.frame_index = (self.frame_index + 1) % len(self.actions_list[self.action]) #getattr(self.actions_list[self.action], self.direction_status)[self.frame_index]
-            self.frame_index = (self.frame_index + 1) % len(getattr(self.actions_list[self.action], self.direction_status)) #getattr(self.actions_list[self.action], self.direction_status)[self.frame_index]
-            self.image = getattr(self.actions_list[self.action], self.direction_status)[self.frame_index]        
+            self.frame_index = (self.frame_index + 1) % frame_count
+            self.image = getattr(self.actions_list[self.action], self.direction_status)[self.frame_index]
+            self.rect = self.image.get_rect(center = self.hitbox.center)
+            
+        # flicker 
+        if not self.vulnerable:
+            alpha = self.wave_value()
+            self.image.set_alpha(alpha)
+        else:
+            self.image.set_alpha(255)   
 
     def move(self, speed):
         if self.direction.magnitude() != 0:
@@ -64,12 +73,11 @@ class GameSprite(pygame.sprite.Sprite):
         self.hitbox.y += self.direction.y * speed
         self.collision('vertical')
         self.rect.center = self.hitbox.topleft
-        # self.pos = self.hitbox.center
 
     def collision(self, axis):
         if axis == 'horizontal':
             for sprite in self.collision_sprites:
-                if sprite.hitbox.colliderect(self.hitbox):
+                if sprite.hitbox.colliderect(self.hitbox) and (sprite.sprite_type != 'weapon' and sprite.sprite_type != 'light' and sprite.sprite_type != 'key' and sprite.sprite_type != 'door_action_area' and sprite.sprite_type != 'exit'):
                     if self.direction.x > 0: # moving right
                         self.hitbox.right = sprite.hitbox.left
                     if self.direction.x < 0: # moving left
@@ -77,8 +85,15 @@ class GameSprite(pygame.sprite.Sprite):
 
         if axis == 'vertical':
             for sprite in self.collision_sprites:
-                if sprite.hitbox.colliderect(self.hitbox):
+                if sprite.hitbox.colliderect(self.hitbox) and (sprite.sprite_type != 'weapon' and sprite.sprite_type != 'light' and sprite.sprite_type != 'key' and sprite.sprite_type != 'door_action_area' and sprite.sprite_type != 'exit'):
                     if self.direction.y > 0: # moving down
                         self.hitbox.bottom = sprite.hitbox.top
                     if self.direction.y < 0: # moving up
                         self.hitbox.top = sprite.hitbox.bottom
+    
+    def wave_value(self):
+        value = sin(pygame.time.get_ticks())
+        if value >= 0: 
+            return 255
+        else: 
+            return 0

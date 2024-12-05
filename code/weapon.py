@@ -1,4 +1,5 @@
 import pygame
+from settings import TILE_SIZE
 
 class Weapon(pygame.sprite.Sprite):
 	def __init__(self, player, groups):
@@ -7,8 +8,7 @@ class Weapon(pygame.sprite.Sprite):
 		direction = player.direction_status
 
 		# graphic
-		full_path = f'../graphics/weapons/{player.weapon}/{direction}.png'
-		self.image = pygame.image.load(full_path).convert_alpha()
+		self.image = pygame.Surface((TILE_SIZE, TILE_SIZE), pygame.SRCALPHA)
 		
 		# placement
 		if direction == 'right':

@@ -8,6 +8,7 @@ from pytmx.util_pygame import load_pygame
 from debug import debug
 from support import *
 from ui import *
+from weapon import Weapon
 import random
 
 class Level:
@@ -17,14 +18,24 @@ class Level:
         self.display_surface = pygame.display.get_surface() # defined in main.py; gets display surface from anywhere in the code
         self.screen_width = self.display_surface.get_size()[0]
         self.screen_height = self.display_surface.get_size()[1]
+        self.game_paused = False
+        self.game_exit = False
 
         # sprite groups
         self.visible_sprites = YSortCameraGroup()
         self.collision_sprites = pygame.sprite.Group()
         self.tmx_data = load_pygame('../data/level_design.tmx')
         
+        # attack sprites
+        self.current_attack = None
+        self.attack_sprites = pygame.sprite.Group()
+        self.attackable_sprites = pygame.sprite.Group()
+        
         # setup sprites
         self.create_map()
+        
+        # door status
+        self.door_open = False
         
         # user interface
         self.ui = UI()
@@ -44,6 +55,12 @@ class Level:
     
     # Draw the map
     def create_map(self):
+        self.item_locations = []
+        self.door_location = []
+        self.open_door_images = []
+        key_img = pygame.image.load('../graphics/key.png').convert_alpha()
+        sword_img = pygame.image.load('../graphics/sword.png').convert_alpha()
+        lamp_img = pygame.image.load('../graphics/lamp.png').convert_alpha()
         # Load sprites for map from the TMX file
         for layer in self.tmx_data.visible_layers:
             if isinstance(layer, pytmx.TiledTileLayer):
@@ -51,14 +68,25 @@ class Level:
                     tile_img = self.tmx_data.get_tile_image_by_gid(gid)
                     if tile_img:
                         tile_img = tile_img.convert_alpha()
+                        tile_img.set_colorkey(COLOR_KEY)
                         if layer.name == 'FloorBlocks':
-                            self.walls = Tile((x * self.tmx_data.tilewidth, y * self.tmx_data.tileheight), self.collision_sprites, 'invisible')
+                            Tile((x * self.tmx_data.tilewidth, y * self.tmx_data.tileheight), self.collision_sprites, 'invisible')
                         elif layer.name == 'Walls':
-                            tile_img.set_colorkey(COLOR_KEY)
-                            self.walls = Tile((x * self.tmx_data.tilewidth, y * self.tmx_data.tileheight), [self.visible_sprites, self.collision_sprites], 'walls', tile_img)
+                            Tile((x * self.tmx_data.tilewidth, y * self.tmx_data.tileheight), [self.visible_sprites, self.collision_sprites], 'walls', tile_img)
+                        elif layer.name == 'DoorClosed':
+                            Tile((x * self.tmx_data.tilewidth, y * self.tmx_data.tileheight), [self.visible_sprites, self.collision_sprites], 'door_closed', tile_img)
+                        elif layer.name == 'DoorActionArea':
+                            Tile((x * self.tmx_data.tilewidth, y * self.tmx_data.tileheight), self.collision_sprites, 'door_action_area')
+                        elif layer.name == 'DoorOpen':
+                            tile_img.set_colorkey('black')
+                            self.image = pygame.Surface((TILE_SIZE, TILE_SIZE), pygame.SRCALPHA)
+                            self.door_location.append((x, y))
+                            self.open_door_images.append(tile_img)
+                        elif layer.name == 'Exit':
+                            Tile((x * self.tmx_data.tilewidth, y * self.tmx_data.tileheight), self.collision_sprites, 'exit')
                         elif layer.name == 'InnerWalls':
                             tile_img.set_colorkey('black')
-                            self.walls = Tile((x * self.tmx_data.tilewidth, y * self.tmx_data.tileheight), [self.visible_sprites, self.collision_sprites], 'inner_walls', tile_img)
+                            Tile((x * self.tmx_data.tilewidth, y * self.tmx_data.tileheight), self.collision_sprites, 'inner_walls')
                         elif layer.name == 'DungeonEnvironment':
                             tile_img.set_colorkey('black')
                             Tile((x * self.tmx_data.tilewidth, y * self.tmx_data.tileheight), [self.visible_sprites, self.collision_sprites], 'objects', tile_img)
@@ -67,9 +95,19 @@ class Level:
                             Tile((x * self.tmx_data.tilewidth, y * self.tmx_data.tileheight), self.visible_sprites, 'objects', tile_img)
                         elif layer.name == 'Enemies':
                             monster_name = random.choice([key for key in monster_data])
-                            Enemy(monster_name, (x * self.tmx_data.tilewidth, y * self.tmx_data.tileheight), self.visible_sprites, self.collision_sprites, spritesheet_image_file = '../graphics/enemies.png')
+                            Enemy(monster_name, (x * self.tmx_data.tilewidth, y * self.tmx_data.tileheight), [self.visible_sprites, self.attackable_sprites], self.collision_sprites, self.damage_player, spritesheet_image_file = '../graphics/enemies.png')
+                        elif layer.name == 'Items':
+                            self.item_locations.append((x, y))
                       
-        self.player = Player((1000, 1000), self.visible_sprites, self.collision_sprites, spritesheet_image_file = '../graphics/dungeon_hero_sprites.png')
+        self.player = Player((1000, 1000), self.visible_sprites, self.collision_sprites, self.create_attack, self.destroy_attack, spritesheet_image_file = '../graphics/dungeon_hero_sprites.png')
+        weapon_pos = random.choice(self.item_locations)
+        self.item_locations.remove(weapon_pos)
+        light_pos = random.choice(self.item_locations)
+        self.item_locations.remove(light_pos)
+        key_pos = random.choice(self.item_locations)
+        self.weapon = Tile((weapon_pos[0] * self.tmx_data.tilewidth, weapon_pos[1] * self.tmx_data.tileheight), [self.visible_sprites, self.collision_sprites], 'weapon', sword_img )
+        self.light = Tile((light_pos[0] * self.tmx_data.tilewidth, light_pos[1] * self.tmx_data.tileheight), [self.visible_sprites, self.collision_sprites], 'light', lamp_img )
+        self.key = Tile((key_pos[0] * self.tmx_data.tilewidth, key_pos[1] * self.tmx_data.tileheight), [self.visible_sprites, self.collision_sprites], 'key', key_img )
     
     def show_darkness(self, player):
         
@@ -93,11 +131,54 @@ class Level:
         
         self.display_surface.blit(subtract_shapes, (0, 0))
     
+    def create_attack(self):
+        self.current_attack = Weapon(self.player, [self.visible_sprites,self.attack_sprites])
+    
+    def destroy_attack(self):
+        if self.current_attack:
+            self.current_attack.kill()
+        self.current_attack = None
+
+    def player_attack_logic(self):
+        if self.attack_sprites:
+            for attack_sprite in self.attack_sprites:
+                collision_sprites = pygame.sprite.spritecollide(attack_sprite, self.attackable_sprites, False)
+                if collision_sprites:
+                    for target_sprite in collision_sprites:
+                        if target_sprite.sprite_type == 'enemy':
+                            target_sprite.get_damage(self.player, attack_sprite.sprite_type)
+    
+    def damage_player(self, amount):
+        if self.player.vulnerable:
+            self.player.health -= amount
+            self.player.vulnerable = False
+            self.player.hurt_time = pygame.time.get_ticks()
+    
+    def toggle_menu(self):
+        self.game_paused = not self.game_paused
+        
+    def end_level(self):
+        self.game_exit = True
+    
     def run(self):
         self.visible_sprites.custom_draw(self.player)
-        self.visible_sprites.update()
         self.show_darkness(self.player)
         self.ui.display(self.player)
+        
+        if self.game_paused:
+            self.ui.show_pause_menu()
+        elif self.game_exit:
+            self.ui.show_end_screen()
+        else:
+            self.visible_sprites.update()
+            self.visible_sprites.enemy_update(self.player)
+            self.player_attack_logic()
+            if self.player.has_key and self.player.check_at_door():
+                door_closed_sprites = [sprite for sprite in self.collision_sprites.sprites() if hasattr(sprite,'sprite_type') and sprite.sprite_type == 'door_closed']
+                for sprite in door_closed_sprites:
+                    sprite.remove(self.collision_sprites)
+                self.visible_sprites.door_update(self.player, self.open_door_images)
+                self.door_open = True
 
 class YSortCameraGroup(pygame.sprite.Group):
     '''Class for camera; sprites sorted by Y coordinates'''
@@ -129,4 +210,16 @@ class YSortCameraGroup(pygame.sprite.Group):
         for sprite in sorted(self.sprites(), key = lambda sprite: sprite.rect.centery):
             offset_pos = sprite.rect.topleft - self.offset
             self.display_surface.blit(sprite.image, offset_pos)
+    
+    def enemy_update(self, player):
+        enemy_sprites = [sprite for sprite in self.sprites() if hasattr(sprite,'sprite_type') and sprite.sprite_type == 'enemy']
+        for enemy in enemy_sprites:
+            enemy.enemy_update(player)
+    
+    def door_update(self, player, open_door_images):
+        '''Update the door sprites when open and close to door'''
+        if player.has_key:
+            door_closed_sprites = [sprite for sprite in self.sprites() if hasattr(sprite,'sprite_type') and sprite.sprite_type == 'door_closed']
+            for index, sprite in enumerate(door_closed_sprites):
+                sprite.image = open_door_images[index]
         
