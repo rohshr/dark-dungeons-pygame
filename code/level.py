@@ -79,14 +79,13 @@ class Level:
                             Tile((x * self.tmx_data.tilewidth, y * self.tmx_data.tileheight), self.collision_sprites, 'door_action_area')
                         elif layer.name == 'DoorOpen':
                             tile_img.set_colorkey('black')
-                            self.image = pygame.Surface((TILE_SIZE, TILE_SIZE), pygame.SRCALPHA)
                             self.door_location.append((x, y))
                             self.open_door_images.append(tile_img)
                         elif layer.name == 'Exit':
                             Tile((x * self.tmx_data.tilewidth, y * self.tmx_data.tileheight), self.collision_sprites, 'exit')
                         elif layer.name == 'InnerWalls':
                             tile_img.set_colorkey('black')
-                            Tile((x * self.tmx_data.tilewidth, y * self.tmx_data.tileheight), self.collision_sprites, 'inner_walls')
+                            Tile((x * self.tmx_data.tilewidth, y * self.tmx_data.tileheight), [self.visible_sprites, self.collision_sprites], 'inner_walls', tile_img)
                         elif layer.name == 'DungeonEnvironment':
                             tile_img.set_colorkey('black')
                             Tile((x * self.tmx_data.tilewidth, y * self.tmx_data.tileheight), [self.visible_sprites, self.collision_sprites], 'objects', tile_img)
@@ -200,9 +199,7 @@ class YSortCameraGroup(pygame.sprite.Group):
         # getting offset from the player
         self.offset.x = player.rect.centerx - self.screen_width // 2 + player.rect.width // 2 # offset to the exact center of the player
         self.offset.y = player.rect.centery - self.screen_height // 2 + player.rect.height // 2
-        # pygame.draw.rect(pygame.display.get_surface(), (255, 0, 0), player.hitbox, 2)
-        
-        
+
         # drawing the floor
         floor_offset_pos = self.floor_rect.topleft - self.offset
         self.display_surface.blit(self.floor_surf, floor_offset_pos)
