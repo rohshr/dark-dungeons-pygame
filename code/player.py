@@ -80,9 +80,9 @@ class Player(GameSprite):
             keys = pygame.key.get_pressed() # Checks for all pressed keys
             
             if keys[pygame.K_LSHIFT]:
-                self.speed = ANIMATION_SPEED * 2
+                self.speed = PLAYER_SPEED * 2
             else:
-                self.speed = ANIMATION_SPEED
+                self.speed = PLAYER_SPEED
                 
             if keys[pygame.K_UP] or keys[pygame.K_w]:
                 self.action = "walking"

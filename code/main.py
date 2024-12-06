@@ -17,7 +17,6 @@ class Game:
         self.level = Level()
         self.ui = UI()
         self.current_screen = 'start_screen'
-        self.start_time = pygame.time.get_ticks()
     
     def run(self):
         while True:

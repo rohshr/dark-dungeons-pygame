@@ -3,7 +3,7 @@ from pygame.math import Vector2
 # Screen dimensions
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
-FPS = 60
+FPS = 30
 HITBOX_OFFSET = {
     'player': 0,
     'objects': 10,
@@ -55,6 +55,7 @@ HEART_ICON = '../graphics/ui/heart.png'
 UI_BORDER_COLOR_ACTIVE = 'gold'
 DARKNESS_COLOR = 'black'
 ENEMY_FOOTSTEP_COLOR = '#F42718'
+PLAYER_SPEED = 5
 
 # invetory setup
 inventory_data = {
@@ -64,10 +65,10 @@ inventory_data = {
 }
 
 monster_data = {
-	'frog': {'health': 100,'exp':100,'damage':2, 'speed': 1, 'resistance': 40, 'attack_radius': 20, 'notice_radius': 300},
-	'skeleton': {'health': 200,'exp':250,'damage':5, 'speed': 1, 'resistance': 15, 'attack_radius': 20, 'notice_radius': 400},
-	'caveman': {'health': 200,'exp':110,'damage':2, 'speed': 1, 'resistance': 10, 'attack_radius': 20, 'notice_radius': 200},
-	'goblin': {'health': 100,'exp':120,'damage':1, 'speed': 1, 'resistance': 20, 'attack_radius': 20, 'notice_radius': 200}
+	'frog': {'health': 100,'exp':100,'damage': -2, 'speed': 4, 'resistance': 40, 'attack_radius': 20, 'notice_radius': 300},
+	'skeleton': {'health': 200,'exp':250,'damage':5, 'speed': 3, 'resistance': 15, 'attack_radius': 20, 'notice_radius': 400},
+	'caveman': {'health': 200,'exp':110,'damage':2, 'speed': 2, 'resistance': 10, 'attack_radius': 20, 'notice_radius': 200},
+	'goblin': {'health': 100,'exp':120,'damage':1, 'speed': 2, 'resistance': 20, 'attack_radius': 20, 'notice_radius': 200}
  }
 
 UI_TEXTS = {
