@@ -29,8 +29,8 @@ class Player(GameSprite):
         self.stats = {
             'health': 100,
             'has_light': False,
-            'has_weapon': True,
-            'has_key': True,
+            'has_weapon': False,
+            'has_key': False,
             'attack': 10
         }
         self.health = self.stats['health']
