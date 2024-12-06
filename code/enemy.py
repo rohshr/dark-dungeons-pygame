@@ -51,6 +51,10 @@ class Enemy(GameSprite):
         self.hit_time = None
         self.invincibility_duration = 300
         
+        # import sound
+        self.enemy_damage_sound = pygame.mixer.Sound('../audio/sfx/21_orc_damage_3.wav')
+        self.enemy_death_sound = pygame.mixer.Sound('../audio/sfx/24_orc_death_spin.wav')
+        
     # Private Helper method    
     def _load_frame(self, action_frames, row, start_col, end_col):
         """Helper method to load frames for a given action and direction."""
@@ -161,10 +165,12 @@ class Enemy(GameSprite):
                 self.health -= player.get_full_weapon_damage()
             self.hit_time = pygame.time.get_ticks()
             self.vulnerable = False
+            self.enemy_damage_sound.play()
 
     def check_death(self):
         if self.health <= 0:
             self.kill()
+            self.enemy_death_sound.play()
     
     def hit_reaction(self):
         if not self.vulnerable:

@@ -5,8 +5,8 @@
     },
     "activeFile": "level_design.tmx",
     "expandedProjectPaths": [
-        ".",
-        "Tilesets"
+        "Tilesets",
+        "."
     ],
     "fileStates": {
         "C:/Users/rohan/Downloads/s23 - Audio & fixes/s23 - Audio & fixes/data/Tilesets/Fences.tsx": {
@@ -119,11 +119,11 @@
             "expandedObjectLayers": [
                 4
             ],
-            "scale": 1.5,
-            "selectedLayer": 2,
+            "scale": 0.75,
+            "selectedLayer": 11,
             "viewCenter": {
-                "x": 615,
-                "y": 732.6666666666665
+                "x": 701.9999999999999,
+                "y": 901.3333333333333
             }
         }
     },

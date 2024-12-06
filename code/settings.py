@@ -57,6 +57,10 @@ DARKNESS_COLOR = 'black'
 ENEMY_FOOTSTEP_COLOR = '#F42718'
 PLAYER_SPEED = 5
 
+# music
+MAIN_MENU_MUSIC = '../audio/music/Goblins_Den_(Regular).wav'
+IN_GAME_MUSIC = '../audio/music/Goblins_Dance_(Battle).wav'
+
 # invetory setup
 inventory_data = {
     'light': ['../graphics/ui/light_inactive.png', '../graphics/ui/light_active.png'],

@@ -39,9 +39,15 @@ class Level:
         
         # user interface
         self.ui = UI()
+        
+        # sounds
+        self.damage_sound = pygame.mixer.Sound('../audio/sfx/11_human_damage_3.wav')
+        self.player_death_sound = pygame.mixer.Sound('../audio/sfx/14_human_death_spin.wav')
+        self.door_open_sound = pygame.mixer.Sound('../audio/sfx/05_door_open_1.mp3')
     
     def create_map(self):
         self.item_locations = []
+        self.player_start_locations = []
         self.door_location = []
         self.open_door_images = []
 
@@ -67,6 +73,7 @@ class Level:
             'InnerWalls': lambda x, y, img: Tile((x, y), [self.visible_sprites, self.collision_sprites], 'inner_walls', set_black_colorkey(img)),
             'DungeonEnvironment': lambda x, y, img: Tile((x, y), [self.visible_sprites, self.collision_sprites], 'objects', set_black_colorkey(img)),
             'Decorations': lambda x, y, img: Tile((x, y), self.visible_sprites, 'objects', set_black_colorkey(img)),
+            'PlayerStartLocations': self.handle_player_start_layer,
             'Enemies': self.handle_enemies_layer,
             'Items': self.handle_items_layer
         }
@@ -96,20 +103,20 @@ class Level:
         self.key = Tile((key_pos[0] * self.tmx_data.tilewidth, key_pos[1] * self.tmx_data.tileheight),
                         [self.visible_sprites, self.collision_sprites], 'key', key_img)
         
-        # Set up player
-        self.handle_player_start_layer(1000, 1000)
-        
-
-    def handle_player_start_layer(self, x, y):
-        """Handle player start position."""
+        # setup player at pseudo-random location
+        start_pos = random.choice(self.player_start_locations)
         self.player = Player(
-            (x, y), 
+            start_pos, 
             self.visible_sprites, 
             self.collision_sprites, 
             self.create_attack, 
             self.destroy_attack, 
             spritesheet_image_file='../graphics/dungeon_hero_sprites.png'
         )
+
+    def handle_player_start_layer(self, x, y, _):
+        """Handle player start position."""
+        self.player_start_locations.append((x, y))
     
     def handle_door_open_layer(self, x, y, img):
         img.set_colorkey('black')
@@ -152,6 +159,7 @@ class Level:
             self.player.health -= amount
             self.player.vulnerable = False
             self.player.hurt_time = pygame.time.get_ticks()
+            self.damage_sound.play()
     
     def toggle_menu(self):
         self.game_paused = not self.game_paused
@@ -177,7 +185,9 @@ class Level:
                 for sprite in door_closed_sprites:
                     sprite.remove(self.collision_sprites)
                 self.visible_sprites.door_update(self.player, self.open_door_images)
-                self.door_open = True
+                if not self.door_open:
+                    self.door_open_sound.play()
+                    self.door_open = True
 
 class YSortCameraGroup(pygame.sprite.Group):
     '''Class for camera; sprites sorted by Y coordinates'''
@@ -218,9 +228,6 @@ class YSortCameraGroup(pygame.sprite.Group):
             
             
     def enemy_update(self, player):
-        # enemy_sprites = [sprite for sprite in self.sprites() if hasattr(sprite,'sprite_type') and sprite.sprite_type == 'enemy']
-        # for enemy in enemy_sprites:
-        #     enemy.enemy_update(player)
         activation_radius = 500  # Distance to activate enemies
         enemy_sprites = [
             sprite for sprite in self.sprites() 

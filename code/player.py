@@ -29,8 +29,8 @@ class Player(GameSprite):
         self.stats = {
             'health': 100,
             'has_light': False,
-            'has_weapon': False,
-            'has_key': False,
+            'has_weapon': True,
+            'has_key': True,
             'attack': 10
         }
         self.health = self.stats['health']
@@ -48,6 +48,10 @@ class Player(GameSprite):
         self.vulnerable = True
         self.hurt_time = None
         self.invulnerability_duration = 500
+        
+        # import sound
+        self.weapon_attack_sound = pygame.mixer.Sound('../audio/sfx/07_human_atk_sword_1.wav')
+        self.item_found_sound = pygame.mixer.Sound('../audio/sfx/08_human_charge_1.wav')
   
     # Private Helper method    
     def _load_frame(self, action_frames, row, start_col, end_col):
@@ -109,6 +113,7 @@ class Player(GameSprite):
                 self.attacking = True
                 self.attack_time = pygame.time.get_ticks()
                 self.create_attack()
+                self.weapon_attack_sound.play()
             
             else:
                 self.action = "idle"
@@ -146,12 +151,15 @@ class Player(GameSprite):
             if sprite.hitbox.colliderect(self.hitbox):
                 if sprite.sprite_type == 'weapon':
                     self.has_weapon = True
+                    self.item_found_sound.play()
                     sprite.kill()
                 elif sprite.sprite_type == 'light':
                     self.has_light = True
+                    self.item_found_sound.play()
                     sprite.kill()
                 elif sprite.sprite_type == 'key':
                     self.has_key = True
+                    self.item_found_sound.play()
                     sprite.kill()
                     
     def get_full_weapon_damage(self):
